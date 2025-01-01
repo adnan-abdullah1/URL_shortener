@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE ${PORT}
 
 # Command to run the application
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]

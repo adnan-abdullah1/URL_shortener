@@ -2,11 +2,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { VersioningType } from '@nestjs/common';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'fatal', 'verbose'],
   });
+
+  // enable security middleware
+  app.use(helmet());
 
   // versioning
   app.enableVersioning({
@@ -26,6 +30,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const port = process.env.PORT || 3000;
+  console.log(port, process.env);
   await app
     .listen(port)
     .catch((err) => {
@@ -34,19 +39,6 @@ async function bootstrap() {
     .then(() => {
       console.log(`Server is running on http://localhost:${port}`);
     });
-
-  // new Request('http://localhost:3001/url-shortener/', {
-  //   method: 'POST',
-  //   body: JSON.stringify({ url: 'example' }),
-  // });
-
-  // setInterval(()=>{
-  //   const response =  fetch('http://localhost:3001/url-shortener/', {
-  //     method: 'POST',
-  //     body: JSON.stringify({ url: 'example'+Math.random() }),
-  //     headers: { 'Content-Type': 'application/json' }
-  //   });
-  // },100);
 }
 
 bootstrap();

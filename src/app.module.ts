@@ -14,10 +14,9 @@ import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
-    AuthModule,
-    UrlShortenerModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env'],
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -37,7 +36,8 @@ import { redisStore } from 'cache-manager-redis-store';
         connectionTimeoutMillis: 2000, // return an error after 2 seconds if connection could not be established
       },
     }),
-    CacheModule.registerAsync({
+    // cache module, use redis as cache store
+    CacheModule.register({
       isGlobal: true,
       useFactory: async () => {
         const store = await redisStore({
@@ -60,6 +60,8 @@ import { redisStore } from 'cache-manager-redis-store';
       },
     ]),
     TypeOrmModule.forFeature([User]),
+    AuthModule,
+    UrlShortenerModule,
   ],
   controllers: [AppController],
   providers: [
