@@ -15,8 +15,8 @@ import { Response } from 'express';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @UseGuards(AuthGuard)
-  @UseFilters(ViewAuthFilter)
+  // @UseGuards(AuthGuard)
+  // @UseFilters(ViewAuthFilter)
   @Get()
   async healthCheck(@Res() res: Response) {
     return res.status(HttpStatus.OK).render('index');
