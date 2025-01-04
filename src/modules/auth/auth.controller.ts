@@ -12,21 +12,23 @@ export class AuthController {
   googleLogin() {
     return 'Google login';
   }
-
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleLoginCallback(@Req() req, @Res() res) {
     const { email, firstName, lastName, picture } = req.user;
     const id = uuidv4();
     try {
-      const user = await this.authService.saveUser({
+      await this.authService.saveUser({
         id,
         email,
         firstName,
         lastName,
         picture,
       });
-      return res.json(user);
+      // calling api on same server and passing id email for token generation
+      const token = await this.authService.signToken({ email });
+      res.cookie('auth_token', token, { httpOnly: true, secure: true });
+      return res.redirect(`/url-shortener/`);
     } catch (error) {
       return res.json(error);
     }

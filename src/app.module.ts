@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './modules/auth/auth.module';
 import { GoogleStrategy } from './google.strategy';
 import { User } from './models/user.entity';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -52,15 +51,14 @@ import { redisStore } from 'cache-manager-redis-store';
         };
       },
     }),
-    // all 5 requests in 60 seconds from one ip address
+    // allow concurrent 5 requests from one ip in 60 seconds
     ThrottlerModule.forRoot([
       {
-        ttl: 60,
-        limit: 5,
+        ttl: 1,
+        limit: 10,
       },
     ]),
     TypeOrmModule.forFeature([User]),
-    AuthModule,
     UrlShortenerModule,
   ],
   controllers: [AppController],
