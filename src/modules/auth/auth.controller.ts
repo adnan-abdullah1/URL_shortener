@@ -1,7 +1,16 @@
-import { Controller, Get, Req, Res, UseGuards, Version } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Req,
+  Res,
+  UseGuards,
+  Version,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -32,5 +41,12 @@ export class AuthController {
     } catch (error) {
       return res.json(error);
     }
+  }
+
+  @Get('/login')
+  async redirectToLogin(@Req() req: Request, @Res() res: Response) {
+    if (!req['user']?.isAuthorized)
+      return res.status(HttpStatus.UNAUTHORIZED).render('index');
+    return res.status(HttpStatus.OK).render('url-shortener');
   }
 }
