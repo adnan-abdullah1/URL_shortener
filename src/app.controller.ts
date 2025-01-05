@@ -21,7 +21,7 @@ export class AppController {
   @Get()
   async redirectToURLShortener(@Req() req: Request, @Res() res: Response) {
     if (!req['user']?.isAuthorized)
-      return res.status(HttpStatus.UNAUTHORIZED).render('index');
+      return res.status(HttpStatus.UNAUTHORIZED).redirect('/v1/login');
     return res.status(HttpStatus.OK).redirect('/url-shortener');
   }
 

@@ -10,7 +10,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -45,8 +45,13 @@ export class AuthController {
 
   @Get('/login')
   async redirectToLogin(@Req() req: Request, @Res() res: Response) {
-    if (!req['user']?.isAuthorized)
+    const token = this.authService.extractTokenFromCookie(req);
+
+    if (!token) return res.status(HttpStatus.UNAUTHORIZED).render('index');
+    const isValidToken = await this.authService.verifyToken(token);
+    if (!isValidToken)
       return res.status(HttpStatus.UNAUTHORIZED).render('index');
+
     return res.status(HttpStatus.OK).render('url-shortener');
   }
 }

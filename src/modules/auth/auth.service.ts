@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/models/user.entity';
 import { Repository } from 'typeorm';
-// import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -45,5 +45,26 @@ export class AuthService {
       expiresIn: '1d',
       secret: process.env.JWT_SECRET,
     });
+  }
+
+  extractTokenFromCookie(request: Request): string | undefined {
+    const tokenStr = request.headers.cookie
+      ?.split(';')
+      .find((el) => el.includes('auth_token'));
+
+    if (!tokenStr) return undefined;
+    const val = tokenStr?.split('=')[1]; // splits like ['auth_token','token_value']
+    return val ?? undefined;
+  }
+
+  async verifyToken(token: string) {
+    try {
+      await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
