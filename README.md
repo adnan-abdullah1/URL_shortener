@@ -1,6 +1,6 @@
 
 # URL Shortener 
-
+App URL: http://adnan-abdullah.site
 This project is a **URL shortener service** built using **NestJS**, featuring **rate limiting**, **caching**, and **database integration**. It follows the **MVC architecture** and uses **cookies for authentication** with **Google OAuth** for user login. **Swagger** is used for API documentation.
 
 ## Features
