@@ -1,115 +1,103 @@
-Here's an improved version of your README file using proper markdown for better readability and organization:
+# Project Overview
 
----
+This project is a web application deployed on AWS, utilizing the NestJS framework, Redis, and PostgreSQL. The app is containerized using Docker, with PostgreSQL deployed on AWS RDS, and the app server and Redis hosted on EC2 instances.
 
-# URL Shortener with Rate Limiting
+## Project Structure
 
-This project is a URL shortener service built using **NestJS**, featuring **rate limiting**, **caching**, and **database integration**. It follows the **MVC architecture** and uses **cookies** for authentication with **Google OAuth** for user login. **Swagger** is used for API documentation.
+- **NestJS**: The backend of the application is built using the NestJS framework.
+- **Redis**: Used for caching and message brokering.
+- **PostgreSQL**: The relational database is deployed on AWS RDS for data storage.
 
-## Features
+## Architecture Overview
 
-- **MVC Architecture**: Separates the application into three interconnected components: Model, View, and Controller.
-- **Rate Limiting**: Limits the number of requests per IP address to prevent abuse.
-- **Cookie-Based Authentication**: Uses cookies to manage user sessions and authentication.
-- **Google OAuth**: Allows users to log in using their Google accounts.
-- **Caching**: Utilizes **Redis** for caching to improve performance and reduce database load.
-- **Database Integration**: Uses **PostgreSQL** for storing URL mappings and user data.
-- **API Documentation**: **Swagger** is used to document and test the API endpoints.
-- **Environment Configuration**: Configurable via environment variables for flexibility across different environments.
+- **AWS EC2**: Hosting the application server and Redis.
+- **AWS RDS**: Running PostgreSQL for data persistence.
+- **Docker**: The entire application is containerized using Docker for ease of deployment and scalability.
 
-## Prerequisites
+## Deployed URLs
 
-Before you begin, ensure you have the following software installed:
+- **App Domain**: [http://adnan-abdullah.site](http://adnan-abdullah.site)
+- **API Documentation**: [http://adnan-abdullah.site/api/docs](http://adnan-abdullah.site/api/docs)
 
-- **Node.js** (version 14 or higher)
-- **PostgreSQL**
-- **Redis**
-- **Google Cloud Platform account** (for Google OAuth credentials)
+## Getting Started
 
-## Installation
+### Prerequisites
 
-### 1. Clone the Repository
+Before running the project locally, ensure you have the following installed:
 
-```bash
-git clone https://github.com/your-username/url-shortener.git
-cd url-shortener
-```
+- Docker
+- Docker Compose
+- Node.js (for local development, if needed)
 
-### 2. Install Dependencies
+### Running Locally
 
-```bash
-npm install
-```
+To run the application locally, use Docker Compose to build and start the containers. 
 
-### 3. Set Up Environment Variables
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd <project-directory>
+   ```
 
-Create a `.env` file in the root directory and populate it with the following variables:
+2. Build the Docker containers:
+   ```bash
+   docker-compose build
+   ```
 
-```env
-DB_HOST=your_database_host
-DB_PORT=your_database_port
-DB_USERNAME=your_database_username
-DB_PASSWORD=your_database_password
-DB_NAME=your_database_name
+3. Start the containers:
+   ```bash
+   docker-compose up
+   ```
 
-REDIS_HOST=your_redis_host
-REDIS_PORT=your_redis_port
+4. The application will be accessible locally at `http://localhost:3000` and the API documentation at `http://localhost:3000/api/docs`.
 
-JWT_SECRET=your_jwt_secret
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_SECRET=your_google_secret
-GOOGLE_CALLBACK_URL=your_google_callback_url
+### Important Notes
 
-NODE_ENV=development
-```
+- **Do not use** `npm run start` to start the application locally. The application is containerized using Docker, and the correct way to run it is through Docker Compose.
 
-### 4. Register Your Application with Google
+### Running in AWS (Production)
 
-To integrate Google OAuth, follow these steps:
+- The project is deployed on AWS, and the resources are already configured for production use, including the AWS EC2 instances for the app server and Redis, and PostgreSQL hosted on AWS RDS.
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Create a new project or select an existing one.
-3. Navigate to the **Credentials** section.
-4. Click **Create credentials** and select **OAuth 2.0 Client IDs**.
-5. Configure the consent screen and set the authorized redirect URI to match your `GOOGLE_CALLBACK_URL`.
+### Environment Variables
 
-## Running the Application
+All configuration is handled through environment variables. You can specify the required variables in the `.env` file for local development or production. 
 
-### 1. Start the Application
+Some of the key environment variables include:
 
-Run the following command to start the application:
+- **DATABASE_URL**: The connection string for PostgreSQL (for local development, this can be configured in `.env` or `docker-compose.yml`).
+- **REDIS_URL**: The Redis connection string (for local development or production).
+- **PORT**: The port the app will run on (default: `3001`).
 
-```bash
-npm run start
-```
+No API keys are required for this project; all configurations are provided via the `.env` file.
 
-### 2. Access the Application
+### Database Setup
 
-The application will be running at [http://localhost:3000](http://localhost:3000).
+- The PostgreSQL database is hosted on AWS RDS. Ensure that the connection details are configured correctly.
+- If running locally, Docker will automatically set up the database using `docker-compose.yml`.
 
-### 3. Access the API Documentation
+### Accessing the API
 
-You can access the API documentation via Swagger at [http://localhost:3000/docs](http://localhost:3000/docs).
+The application exposes several API endpoints, and you can interact with them using the following:
 
-## Configuration
+- **GET** `/docs`: Access the API documentation (Swagger UI) for all available endpoints.
+- **Other Endpoints**: Consult the API documentation for detailed endpoint information and usage.
 
-### Rate Limiting
+### Redis Integration
 
-Rate limiting is configured to allow **10 requests per minute** per IP address. You can adjust this setting in the `app.module.ts` file under the `ThrottlerModule` configuration.
+Redis is used for caching and fast data storage. Make sure Redis is properly configured and running on AWS EC2 instances. The Redis connection details can be configured in the `.env` file or Docker Compose.
 
-### Database
+## Deployment
 
-Ensure your PostgreSQL database is set up and accessible with the credentials provided in the `.env` file. You can use tools like **pgAdmin** or **psql** to manage your database.
+### AWS Setup
 
-### Caching
+1. **EC2 Instances**:
+   - The application server and Redis are deployed on AWS EC2 instances.
+   - SSH access to these instances is required for management and troubleshooting.
 
-Redis is used for caching. Make sure your Redis server is running and accessible with the credentials provided in the `.env` file.
+2. **RDS**:
+   - PostgreSQL is deployed on AWS RDS.
+   - Ensure the database security groups and networking rules are correctly set up to allow connections from the EC2 instances.
 
-### Authentication
 
-JWT is used for session management and is stored in cookies. Ensure the `JWT_SECRET` is set in the `.env` file.
-
-### Swagger
-
-API documentation is set up using Swagger and can be accessed at `/docs`.
-
+This should now accurately reflect that no API key is needed and all configurations are handled via the `.env` file.
