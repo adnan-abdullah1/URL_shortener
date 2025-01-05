@@ -34,9 +34,9 @@ export class UrlShortenerController {
   async shortenUrl(@Req() req, @Res() res) {
     const { url } = req.body;
     const prefix = `${req.protocol}://${req.hostname}:${process.env.PORT}/url-shortener/`;
-
     // check if url is already in db, then send old existing hash
     const existingUrl = await this.urlShortenerService.getURLbyURL(url);
+
     if (existingUrl)
       return res.render('url-shortener', {
         shortURL: `${prefix}${existingUrl.hash}`,

@@ -14,10 +14,10 @@ async function bootstrap() {
   // app.use(helmet());
 
   // set rendering engine
-  app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
-
+  // serve static assets
+  app.useStaticAssets(join(__dirname, '..', 'public'));
   // versioning
   app.enableVersioning({
     type: VersioningType.URI,

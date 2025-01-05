@@ -29,10 +29,13 @@ import { redisStore } from 'cache-manager-redis-store';
       logging: process.env.NODE_ENV === 'development',
       // connection pool configuration, this configuration needs to be benchmarked to get full potential
       extra: {
-        max: 1000,
-        min: 1000,
-        idleTimeoutMillis: 30000, // close idle clients after 30 seconds
-        connectionTimeoutMillis: 2000, // return an error after 2 seconds if connection could not be established
+        max: 5,
+        min: 100,
+        idleTimeoutM1000illis: 30000, // close idle clients after 30 seconds
+        connectionTimeoutMillis: 10000, // return an error after 2 min if connection could not be established
+      },
+      ssl: {
+        rejectUnauthorized: false,
       },
     }),
     // cache module, use redis as cache store
