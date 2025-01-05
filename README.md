@@ -22,14 +22,15 @@ This project is a **URL shortener service** built using **NestJS**, featuring **
 
 To run this project locally, you’ll need the following:
 
-- **Node.js**
-- **PostgreSQL**
-- **Redis**
-- **Google Cloud Platform account**
+- **Docker** (for containerized deployment)
+- **Docker Compose** (for managing multiple services like Redis and PostgreSQL)
+- **Google Cloud Platform account** (for Google OAuth integration)
 
 ---
 
 ### Installation
+
+#### Method 1: Running with Docker Compose
 
 1. **Clone the repository**:
 
@@ -38,19 +39,13 @@ To run this project locally, you’ll need the following:
    cd url-shortener
    ```
 
-2. **Install dependencies**:
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up your environment variables** in a `.env` file:
+2. **Create a `.env` file** in the project root with the necessary environment variables. For example:
 
    ```env
    # GOOGLE secrets
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_SECRET=your_google_secret
-   GOOGLE_CALLBACK_URL=http://localhost:3001/auth/google/callback
+   GOOGLE_CALLBACK_URL=
 
    # Database configuration
    DB_HOST=your_database_host
@@ -72,27 +67,55 @@ To run this project locally, you’ll need the following:
    JWT_SECRET=your_jwt_secret
    ```
 
-4. **Register your application with Google**:
+3. **Start the services with Docker Compose**:
 
-   - Go to [Google Cloud Console](https://console.cloud.google.com/).
-   - Create a new project or select an existing one.
-   - Navigate to the **Credentials** section.
-   - Click **Create credentials** and select **OAuth 2.0 Client IDs**.
-   - Configure the consent screen and set the authorized redirect URI to match your `GOOGLE_CALLBACK_URL` (e.g., `http://localhost:3001/auth/google/callback`).
+   ```bash
+   docker-compose up --build
+   ```
+
+   This will start the following containers:
+
+   - **NestJS application** (running on port `3001`)
+   - **PostgreSQL** (for storing URL mappings and user data)
+   - **Redis** (for caching)
+
+   The application will be accessible at `http://localhost:3001`.
 
 ---
 
-### Running the Application
+#### Method 2: Running without Docker Compose
 
-1. **Start the application**:
+If you prefer not to use Docker Compose and run the app manually:
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone <repository-url>
+   cd url-shortener
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up your environment variables** in a `.env` file (refer to the `.env` example above).
+
+4. **Start the application**:
 
    ```bash
    npm run start
    ```
 
-2. The application will be running at `http://localhost:3001`.
+   The application will be running at `http://localhost:3001`.
 
-3. Access the **API documentation** at `http://localhost:3001/docs`.
+---
+
+### Running the Application with Docker Compose
+
+1. The application will be running at `http://localhost:3001`.
+2. Access the **API documentation** at `http://localhost:3001/docs`.
 
 ---
 
@@ -120,17 +143,7 @@ To run this project locally, you’ll need the following:
 
 ---
 
-## Project
 
-The project follows the MVC architecture,
-
----
-
-## API Docs
-
-The API documentation can be accessed at `http://localhost:3001/docs`.
-
----
 
 ## Environment Variables
 
@@ -143,7 +156,7 @@ GOOGLE_SECRET=
 GOOGLE_CALLBACK_URL=http://localhost:3001/auth/google/callback
 
 # Database configuration
-DB_HOST=database-1.cbsus4csg3s5.us-east-1.rds.amazonaws.com
+DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
@@ -159,7 +172,7 @@ REDIS_PORT=6379
 REDIS_HOST=localhost
 
 # JWT secret
-JWT_SECRET=qm91skxrpyxdqjzj
+JWT_SECRET=qm91skxrpyxdjzj
 ```
 
 ---
@@ -176,5 +189,4 @@ ThrottlerModule.forRoot({
 ```
 
 ---
-
 
