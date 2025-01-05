@@ -1,103 +1,180 @@
-# Project Overview
 
-This project is a web application deployed on AWS, utilizing the NestJS framework, Redis, and PostgreSQL. The app is containerized using Docker, with PostgreSQL deployed on AWS RDS, and the app server and Redis hosted on EC2 instances.
+# URL Shortener 
 
-## Project Structure
+This project is a **URL shortener service** built using **NestJS**, featuring **rate limiting**, **caching**, and **database integration**. It follows the **MVC architecture** and uses **cookies for authentication** with **Google OAuth** for user login. **Swagger** is used for API documentation.
 
-- **NestJS**: The backend of the application is built using the NestJS framework.
-- **Redis**: Used for caching and message brokering.
-- **PostgreSQL**: The relational database is deployed on AWS RDS for data storage.
+## Features
 
-## Architecture Overview
+- **MVC Architecture**: Separates the application into three interconnected components: Model, View, and Controller.
+- **Rate Limiting**: Limits the number of requests per IP address to prevent abuse.
+- **Cookie-Based Authentication**: Uses cookies to manage user sessions and authentication.
+- **Google OAuth**: Allows users to log in using their Google accounts.
+- **Caching**: Utilizes **Redis** for caching to improve performance and reduce database load.
+- **Database Integration**: Uses **PostgreSQL** for storing URL mappings and user data.
+- **API Documentation**: Swagger is used to document and test the API endpoints.
+- **Environment Configuration**: Configurable via environment variables for flexibility across different environments.
 
-- **AWS EC2**: Hosting the application server and Redis.
-- **AWS RDS**: Running PostgreSQL for data persistence.
-- **Docker**: The entire application is containerized using Docker for ease of deployment and scalability.
-
-## Deployed URLs
-
-- **App Domain**: [http://adnan-abdullah.site](http://adnan-abdullah.site)
-- **API Documentation**: [http://adnan-abdullah.site/api/docs](http://adnan-abdullah.site/api/docs)
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-Before running the project locally, ensure you have the following installed:
+To run this project locally, you’ll need the following:
 
-- Docker
-- Docker Compose
-- Node.js (for local development, if needed)
+- **Node.js**
+- **PostgreSQL**
+- **Redis**
+- **Google Cloud Platform account**
 
-### Running Locally
+---
 
-To run the application locally, use Docker Compose to build and start the containers. 
+### Installation
 
-1. Clone the repository:
+1. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
-   cd <project-directory>
+   cd url-shortener
    ```
 
-2. Build the Docker containers:
+2. **Install dependencies**:
+
    ```bash
-   docker-compose build
+   npm install
    ```
 
-3. Start the containers:
+3. **Set up your environment variables** in a `.env` file:
+
+   ```env
+   # GOOGLE secrets
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_SECRET=your_google_secret
+   GOOGLE_CALLBACK_URL=http://localhost:3001/auth/google/callback
+
+   # Database configuration
+   DB_HOST=your_database_host
+   DB_PORT=5432
+   DB_USERNAME=your_database_username
+   DB_PASSWORD=your_database_password
+   DB_NAME=your_database_name
+   POSTGRES_PASSWORD=your_postgres_password
+
+   # Application 
+   NODE_ENV=development
+   PORT=3001
+
+   # Redis
+   REDIS_PORT=6379
+   REDIS_HOST=localhost
+
+   # JWT secret
+   JWT_SECRET=your_jwt_secret
+   ```
+
+4. **Register your application with Google**:
+
+   - Go to [Google Cloud Console](https://console.cloud.google.com/).
+   - Create a new project or select an existing one.
+   - Navigate to the **Credentials** section.
+   - Click **Create credentials** and select **OAuth 2.0 Client IDs**.
+   - Configure the consent screen and set the authorized redirect URI to match your `GOOGLE_CALLBACK_URL` (e.g., `http://localhost:3001/auth/google/callback`).
+
+---
+
+### Running the Application
+
+1. **Start the application**:
+
    ```bash
-   docker-compose up
+   npm run start
    ```
 
-4. The application will be accessible locally at `http://localhost:3000` and the API documentation at `http://localhost:3000/api/docs`.
+2. The application will be running at `http://localhost:3001`.
 
-### Important Notes
+3. Access the **API documentation** at `http://localhost:3001/docs`.
 
-- **Do not use** `npm run start` to start the application locally. The application is containerized using Docker, and the correct way to run it is through Docker Compose.
+---
 
-### Running in AWS (Production)
+## Configuration
 
-- The project is deployed on AWS, and the resources are already configured for production use, including the AWS EC2 instances for the app server and Redis, and PostgreSQL hosted on AWS RDS.
+### Rate Limiting
 
-### Environment Variables
+- Configured to allow **10 requests per minute per IP address**. This can be adjusted in the `app.module.ts` file under the `ThrottlerModule` configuration.
 
-All configuration is handled through environment variables. You can specify the required variables in the `.env` file for local development or production. 
+### Database
 
-Some of the key environment variables include:
+- Ensure your **PostgreSQL** database is set up and accessible with the credentials provided in the `.env` file.
 
-- **DATABASE_URL**: The connection string for PostgreSQL (for local development, this can be configured in `.env` or `docker-compose.yml`).
-- **REDIS_URL**: The Redis connection string (for local development or production).
-- **PORT**: The port the app will run on (default: `3001`).
+### Caching
 
-No API keys are required for this project; all configurations are provided via the `.env` file.
+- **Redis** is used for caching. Ensure your **Redis server** is running and accessible.
 
-### Database Setup
+### Authentication
 
-- The PostgreSQL database is hosted on AWS RDS. Ensure that the connection details are configured correctly.
-- If running locally, Docker will automatically set up the database using `docker-compose.yml`.
+- Uses **JWT** stored in cookies for session management. Ensure your `JWT_SECRET` is set in the `.env` file.
 
-### Accessing the API
+### Swagger
 
-The application exposes several API endpoints, and you can interact with them using the following:
+- **API documentation** is set up using Swagger, accessible at `/docs`.
 
-- **GET** `/docs`: Access the API documentation (Swagger UI) for all available endpoints.
-- **Other Endpoints**: Consult the API documentation for detailed endpoint information and usage.
+---
 
-### Redis Integration
+## Project
 
-Redis is used for caching and fast data storage. Make sure Redis is properly configured and running on AWS EC2 instances. The Redis connection details can be configured in the `.env` file or Docker Compose.
+The project follows the MVC architecture,
 
-## Deployment
+---
 
-### AWS Setup
+## API Docs
 
-1. **EC2 Instances**:
-   - The application server and Redis are deployed on AWS EC2 instances.
-   - SSH access to these instances is required for management and troubleshooting.
+The API documentation can be accessed at `http://localhost:3001/docs`.
 
-2. **RDS**:
-   - PostgreSQL is deployed on AWS RDS.
-   - Ensure the database security groups and networking rules are correctly set up to allow connections from the EC2 instances.
+---
+
+## Environment Variables
+
+Ensure your `.env` file is configured with the correct values for local and production environments.
+
+```env
+# GOOGLE secrets
+GOOGLE_CLIENT_ID=
+GOOGLE_SECRET=
+GOOGLE_CALLBACK_URL=http://localhost:3001/auth/google/callback
+
+# Database configuration
+DB_HOST=database-1.cbsus4csg3s5.us-east-1.rds.amazonaws.com
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=alter_db
+POSTGRES_PASSWORD=pgpasswd
+
+# Application 
+NODE_ENV=development
+PORT=3001
+
+# Redis
+REDIS_PORT=6379
+REDIS_HOST=localhost
+
+# JWT secret
+JWT_SECRET=qm91skxrpyxdqjzj
+```
+
+---
+
+## Rate Limiting Configuration
+
+The rate limiting configuration is handled in `app.module.ts` using `ThrottlerModule`:
+
+```typescript
+ThrottlerModule.forRoot({
+  ttl: 60,  // 1 minute
+  limit: 10, // 10 requests per minute per IP
+}),
+```
+
+---
 
 
-This should now accurately reflect that no API key is needed and all configurations are handled via the `.env` file.
