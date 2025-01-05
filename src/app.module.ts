@@ -57,7 +57,7 @@ import { redisStore } from 'cache-manager-redis-store';
     // allow concurrent 5 requests from one ip in 60 seconds
     ThrottlerModule.forRoot([
       {
-        ttl: 1,
+        ttl: 60,
         limit: 10,
       },
     ]),
