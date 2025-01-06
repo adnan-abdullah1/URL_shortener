@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Base62Chars } from 'src/constants/constants';
 import { HashCounter } from 'src/models/hash-counter.entity';
 import { URL } from 'src/models/url.entity';
+import { User } from 'src/models/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -26,7 +27,12 @@ export class UrlShortenerService {
    * @param data
    * @returns Promise<URL>
    */
-  saveUrl(data: { url: string; hash: string; id: string }): Promise<URL> {
+  saveUrl(data: {
+    url: string;
+    hash: string;
+    id: string;
+    user: User;
+  }): Promise<URL> {
     return this.urlRepository.save(data);
   }
 
@@ -63,6 +69,16 @@ export class UrlShortenerService {
     }
   }
 
+  async updateClickCount(url: string) {
+    await this.urlRepository
+      .createQueryBuilder()
+      .update(URL)
+      .set({
+        click_count: () => 'click_count + 1',
+      })
+      .where('url = :url', { url })
+      .execute();
+  }
   /**
    * Get hash counter from db
    * @returns Promise<void>
@@ -120,5 +136,9 @@ export class UrlShortenerService {
    */
   async getURLbyURL(url: string): Promise<URL> {
     return this.urlRepository.findOne({ where: { url }, select: ['hash'] });
+  }
+
+  async getClickCount(userId: string) {
+    return this.urlRepository.find({ where: { user: { id: userId } } });
   }
 }

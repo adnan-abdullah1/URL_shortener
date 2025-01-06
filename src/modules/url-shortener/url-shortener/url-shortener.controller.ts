@@ -7,17 +7,21 @@ import {
   Res,
   UseFilters,
   UseGuards,
-  Version,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { UrlShortenerService } from './url-shortener.service';
-import { ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { ViewAuthFilter } from 'src/exceptions/unauthorized.exception';
+import { UserService } from 'src/user/user.service';
+import { Request, Response } from 'express';
 
 @Controller('url-shortener')
 export class UrlShortenerController {
-  constructor(private readonly urlShortenerService: UrlShortenerService) {}
+  constructor(
+    private readonly urlShortenerService: UrlShortenerService,
+    private readonly userService: UserService,
+  ) {}
 
   @UseGuards(AuthGuard)
   @UseFilters(ViewAuthFilter)
@@ -29,37 +33,110 @@ export class UrlShortenerController {
   @UseGuards(AuthGuard)
   @UseFilters(ViewAuthFilter)
   @Post('shorten')
-  // add middleware todo
   @ApiBody({ schema: { example: { url: 'https://www.google.com' } } }) // this is for swagger
   async shortenUrl(@Req() req, @Res() res) {
-    const { url } = req.body;
-    const prefix = `${req.protocol}://${req.hostname}:${process.env.PORT}/url-shortener/`;
-    // check if url is already in db, then send old existing hash
-    const existingUrl = await this.urlShortenerService.getURLbyURL(url);
+    try {
+      const { url } = req.body;
+      const { email } = req['user'];
+      const prefix = `${req.protocol}://${req.hostname}:${process.env.PORT}/url-shortener/`;
+      const user = await this.userService.findUser(email);
 
-    if (existingUrl)
-      return res.render('url-shortener', {
-        shortURL: `${prefix}${existingUrl.hash}`,
+      if (!user || !user.id) {
+        // handle error if the user is not found
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: 'User not found' });
+      }
+
+      // Check if URL already exists in the database
+      const existingUrl = await this.urlShortenerService.getURLbyURL(url);
+      if (existingUrl) {
+        return res.status(HttpStatus.OK).json({
+          shortURL: `${prefix}${existingUrl.hash}`,
+        });
+      }
+
+      const hash = await this.urlShortenerService.convertToBase62();
+      const id = uuidv4();
+
+      await this.urlShortenerService.saveUrl({
+        id,
+        url,
+        hash,
+        user: user,
       });
 
-    const hash = await this.urlShortenerService.convertToBase62();
-    const id = uuidv4();
-    await this.urlShortenerService.saveUrl({ id, url, hash });
-
-    return res.status(HttpStatus.MOVED_PERMANENTLY).render('url-shortener', {
-      shortURL: `${prefix}${hash}`,
-    });
+      return res.status(HttpStatus.OK).json({
+        shortURL: `${prefix}${hash}`,
+      });
+    } catch (error) {
+      console.error('Error shortening URL:', error);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: error,
+      });
+    }
   }
 
   @UseGuards(AuthGuard)
   @UseFilters(ViewAuthFilter)
-  @Get(':hash')
-  @Version('')
-  @ApiParam({ name: 'hash', example: 'abc' }) // this is for swagger
+  @Post('/original-url')
   async getUrl(@Req() req, @Res() res) {
-    const { hash } = req.params;
-    const url = await this.urlShortenerService.getURL(hash);
+    try {
+      const { shortURL } = req.body;
+      if (!shortURL) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: 'URL is required' });
+      }
 
-    return res.redirect(url);
+      // Extract  hash from the shortened URL
+      const hash = new URL(shortURL).pathname.split('/').filter(Boolean).pop();
+
+      const url = await this.urlShortenerService.getURL(hash);
+
+      if (!url) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'URL not found for the provided hash' });
+      }
+
+      // Update the click count (could be saved in Redis for later periodic update)
+      await this.urlShortenerService.updateClickCount(url);
+
+      return res.json({ originalURL: url });
+    } catch (error) {
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error });
+    }
+  }
+
+  @Get(':hash')
+  async redirectToLongURL(@Req() req: Request, @Res() res: Response) {
+    try {
+      const { hash } = req.params;
+      if (!hash) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: 'URL is required' });
+      }
+
+      const url = await this.urlShortenerService.getURL(hash);
+
+      if (!url) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'URL not found for the provided hash' });
+      }
+
+      // Update the click count (could be saved in Redis for later periodic update)
+      await this.urlShortenerService.updateClickCount(url);
+
+      return res.status(HttpStatus.MOVED_PERMANENTLY).redirect(url);
+    } catch (error) {
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error });
+    }
   }
 }

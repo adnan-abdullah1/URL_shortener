@@ -10,6 +10,9 @@ import { UrlShortenerModule } from './modules/url-shortener/url-shortener/url-sh
 import { APP_GUARD } from '@nestjs/core';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
+import { UserService } from './user/user.service';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { URL } from './models/url.entity';
 
 @Module({
   imports: [
@@ -61,14 +64,16 @@ import { redisStore } from 'cache-manager-redis-store';
         limit: 10,
       },
     ]),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, URL]),
     UrlShortenerModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     GoogleStrategy,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    UserService,
   ],
 })
 export class AppModule {}

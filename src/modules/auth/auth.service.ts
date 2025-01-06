@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/models/user.entity';
 import { Repository } from 'typeorm';
 import { Request } from 'express';
+import * as bcrypt from 'bcrypt';
+import { UserType } from 'src/enum/user-type';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +16,7 @@ export class AuthService {
   ) {}
 
   /**
-   * Save user to database
+   * Save user to database, when use comes via google OAUTH
    * @param user
    * @returns Promise<User>>
    */
@@ -23,7 +25,9 @@ export class AuthService {
     email: string;
     firstName: string;
     lastName: string;
-    picture: string;
+    picture?: string;
+    password?: string;
+    userType: UserType;
   }) {
     const data = {
       id: user.id,
@@ -31,6 +35,8 @@ export class AuthService {
       firstname: user.firstName,
       lastname: user.lastName,
       picture: user.picture,
+      password: user.password,
+      user_type: user.userType,
     };
     return this.usersRepository
       .createQueryBuilder()
@@ -40,7 +46,7 @@ export class AuthService {
       .orIgnore()
       .execute();
   }
-  signToken(payload: { email: string }) {
+  signToken(payload: { email: string; userId: string }) {
     return this.jwtService.signAsync(payload, {
       expiresIn: '1d',
       secret: process.env.JWT_SECRET,
@@ -66,5 +72,13 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  async hashPassword(password: string) {
+    return bcrypt.hash(password, parseInt(process.env.SAlT_ROUNDS));
+  }
+
+  async verifyPasswordHash(password: string, hash: string) {
+    return bcrypt.compare(password, hash);
   }
 }

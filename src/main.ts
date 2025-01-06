@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { VersioningType } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
@@ -15,12 +14,7 @@ async function bootstrap() {
   app.setViewEngine('hbs');
   // serve static assets
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  // versioning
-  app.enableVersioning({
-    type: VersioningType.URI,
-    prefix: '',
-    defaultVersion: '',
-  });
+
 
   const config = new DocumentBuilder()
     .setTitle('URL Shortener')

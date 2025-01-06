@@ -12,45 +12,155 @@
 <body>
     <div class="container mt-5">
         <h1>URL Shortener</h1>
-        <form id="urlForm" action="/url-shortener/shorten" method="POST">
-            <div class="mb-3">
-                <label for="url" class="form-label">Enter URL</label>
-                <input type="url" class="form-control" id="url" name="url" required>
-            </div>
-            <button type="submit" class="btn btn-primary" id="submitButton">Shorten URL</button>
-        </form>
-        {{#if shortURL}}
-        <div class="mt-3">
-            <h4>Shortened URL</h4>
-            <p>Your shortened URL is: <a href="{{shortURL}}" data-bs-toggle="tooltip" title="Visit the original URL"
-                    target="_blank">{{shortURL}}</a></p>
-        </div>
-        {{/if}}
 
-        {{#if originalURL}}
-        <div class="mt-3">
-            <h4>Original URL</h4>
-            <p>Your Original URL is: <a href="{{originalURL}}" target="_blank">{{originalURL}}</a></p>
+        <!-- Bootstrap Tabs for Shortened and Original URLs -->
+        <ul class="nav nav-tabs" id="urlTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="shortened-tab" data-bs-toggle="tab" href="#shortened" role="tab"
+                    aria-controls="shortened" aria-selected="true">Shortened URL</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="original-tab" data-bs-toggle="tab" href="#original" role="tab"
+                    aria-controls="original" aria-selected="false">Original URL</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="urlTabsContent">
+            <!-- Shortened URL Tab -->
+            <div class="tab-pane fade show active" id="shortened" role="tabpanel" aria-labelledby="shortened-tab">
+                <div class="mb-3">
+                    <label for="url" class="form-label">Enter URL</label>
+                    <input type="url" class="form-control mb-3" id="url" name="url" required>
+                    <button type="button" onclick="shortenURL()" class="btn btn-primary" id="shortenButton">Shorten
+                        URL</button>
+                </div>
+
+                <div id="shortenedURLResult" class="mt-3" style="display: none;">
+                    <h4>Shortened URL</h4>
+                    <p>Your shortened URL is: <a id="shortenedURL" href="" target="_blank"></a></p>
+                </div>
+            </div>
+
+            <!-- Original URL Tab -->
+            <div class="tab-pane fade" id="original" role="tabpanel" aria-labelledby="original-tab">
+                <div class="mb-3">
+                    <label for="shortURL" class="form-label">Enter Shortened Hash</label>
+                    <input type="text" class="form-control mb-2" id="shortURL" name="shortURL" required>
+                    <button type="button" onclick="getOriginalURL()" class="btn btn-primary" id="getOriginalButton">Get
+                        Original URL</button>
+                </div>
+
+                <div id="originalURLResult" class="mt-3" style="display: none;">
+                    <h4>Original URL</h4>
+                    <p>Your original URL is: <a id="originalURL" href="" target="_blank"></a></p>
+                </div>
+            </div>
         </div>
-        {{/if}}
+
+        <!-- Analytics Button Below the Form -->
+        <div class="col-12 mt-3">
+            <a href="/analytics/" class="btn btn-secondary">
+                View Analytics
+            </a>
+        </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
     <script>
-        const form = document.getElementById('urlForm');
-        const submitButton = document.getElementById('submitButton');
+        // Function to shorten URL
+        function shortenURL() {
+            const url = document.getElementById('url').value;
+            const shortenButton = document.getElementById('shortenButton');
 
-        form.addEventListener('submit', (event) => {
-            // Disable the button to prevent multiple submissions
-            submitButton.disabled = true;
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
 
-            // Optional: Update the button text to indicate submission
-            submitButton.textContent = 'Processing...';
-        });
+            // Change button text to indicate processing
+            shortenButton.innerText = 'Processing...';
+            shortenButton.disabled = true;
+
+            // API call to shorten URL
+            fetch('/url-shortener/shorten', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url }),
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const shortenedURL = document.getElementById('shortenedURL');
+                    const result = document.getElementById('shortenedURLResult');
+
+                    if (data.shortURL) {
+                        shortenedURL.href = data.shortURL;
+                        shortenedURL.textContent = data.shortURL;
+                        result.style.display = 'block';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error shortening URL:', err);
+                    alert('Error shortening URL');
+                })
+                .finally(() => {
+                    shortenButton.innerText = 'Shorten URL';
+                    shortenButton.disabled = false;
+                });
+        }
+
+        // Function to get the original URL from the shortened hash
+        function getOriginalURL() {
+            const shortURL = document.getElementById('shortURL').value;
+            const getOriginalButton = document.getElementById('getOriginalButton');
+
+            if (!shortURL) {
+                alert('Please enter a shortened url');
+                return;
+            }
+
+            // Change button text to indicate processing
+            getOriginalButton.innerText = 'Processing...';
+            getOriginalButton.disabled = true;
+
+            // API call to get original URL
+            fetch(`/url-shortener/original-url`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ shortURL }),
+            })
+                .then(res =>{
+                    if(!res.ok){
+                        throw new Error('')
+                    }
+                    return  res.json()
+                })
+                .then(data => {
+                    const originalURL = document.getElementById('originalURL');
+                    const result = document.getElementById('originalURLResult');
+
+                    if (data.originalURL) {
+                        originalURL.href = data.originalURL;
+                        originalURL.textContent = data.originalURL;
+                        result.style.display = 'block';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error getting original URL:', err);
+                    alert('Error retrieving original URL');
+                })
+                .finally(() => {
+                    getOriginalButton.innerText = 'Get Original URL';
+                    getOriginalButton.disabled = false;
+                });
+        }
     </script>
-
-
 </body>
 
 </html>

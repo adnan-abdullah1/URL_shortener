@@ -10,26 +10,106 @@
 
 <body>
   <div class="container d-flex justify-content-center align-items-center " style="height: 100vh;">
-    <form action="/v1/auth/google" method="get">
-    <button type="submit"
-      class="btn btn-light btn-lg d-flex align-items-center shadow-sm border rounded-pill px-4 py-2">
-      <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" class="me-2" width="24"
-        height="24">
-      <span class="">Sign in with Google</span>
-    </button>
+    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+      <div class="row">
+        <!-- Email and Password login form -->
+        <div class="col-12">
+          {{!-- <form action="/v1/auth/login" method="post"> --}}
+            <p id="errorLabel" class="d-none border-1">Validation Error</p>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password"
+                placeholder="Enter your password" required>
+            </div>
+            <button class="btn btn-primary btn-lg w-100" id="btn" onclick="login()">Login</button>
+            {{!--
+          </form> --}}
+        </div>
+        <!-- Google login button -->
+        <div class="col-12 mt-3">
+          <form action="/auth/google" method="get">
+            <button type="submit"
+              class="btn btn-light btn-lg d-flex align-items-center shadow-sm border px-4 py-2 w-100">
+              <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" class="me-2"
+                width="24" height="24">
+              <span>Sign in with Google</span>
+            </button>
+          </form>
+        </div>
+        <!-- Registration Button -->
+        <div class="col-12 mt-3">
+          <a href="/auth/register"
+            class="btn btn-secondary btn-lg w-100 d-flex align-items-center justify-content-center">
+            Register for an Account
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
-  </form>
-  </div>
+  <script>
+    const el = document.getElementById('errorLabel')
+    const submitBtn = document.getElementById('btn')
 
+    const userNameEl = document.getElementById('userName');
+    const passwordEl = document.getElementById('userName');
+    [userNameEl, passwordEl].forEach(el => {
+      document.addEventListener('keypress', () => {
+        const el = document.getElementById('errorLabel')
+
+        el.classList.add('d-none')
+      })
+    })
+
+    // login logic
+    function login() {
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value;
+      if (!email || !password) {
+        if (el) {
+          el.innerText = 'Fill both email and password'
+          el.classList.remove('d-none')
+          el.classList.add('text-danger')
+        }
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Logging in.."
+
+      fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      }).
+        then(res => {
+          if (!res.ok && res.status === 401) {
+            throw new Error('invalid credentials')
+          }
+          return res.json();
+        })
+        .then(data => {
+          document.location = '/url-shortener'
+        })
+        .catch(err => {
+          console.log('reached')
+          el.classList.remove('d-none')
+          el.classList.add('text-danger')
+          el.innerText = err
+
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Login"
+        })
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
-  <script>
-</body >
-</html >
+</body>
 
-
-
-
-
-  
+</html>
