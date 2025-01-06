@@ -87,9 +87,9 @@ export class AuthController {
 
     // create token and add to cookie
     const token = await this.authService.signToken({ email, userId: user.id });
-    res.cookie('auth_token', token);
+    res.cookie('auth_token', token, { httpOnly: true, secure: true });
 
-    return res.status(HttpStatus.CREATED).json({ login: true });
+    return res.status(HttpStatus.OK).json({ login: true });
   }
 
   @Get('/register')
