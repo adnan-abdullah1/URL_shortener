@@ -88,9 +88,8 @@ export class AuthController {
     // create token and add to cookie
     const token = await this.authService.signToken({ email, userId: user.id });
     res.cookie('auth_token', token, { httpOnly: true, secure: true });
-    // delete password in user
-    delete user.password;
-    return res.json({ login: true, data: { ...user } });
+
+    return res.status(HttpStatus.CREATED).json({ login: true });
   }
 
   @Get('/register')
