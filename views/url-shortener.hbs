@@ -133,6 +133,7 @@
 
         // Function to shorten URL
         function shortenURL() {
+            debugger
             const url = document.getElementById('url').value;
             const shortenButton = document.getElementById('shortenButton');
 
@@ -176,7 +177,6 @@
                 })
                 .catch(err => {
                     console.error('Error shortening URL:', err);
-                    { { !--alert('Error shortening URL'); --} }
                 })
                 .finally(() => {
                     shortenButton.innerText = 'Shorten URL';
@@ -208,6 +208,7 @@
             })
                 .then(res => {
                     if (!res.ok) {
+                        debugger
                         throw new Error('')
                     }
                     return res.json()
