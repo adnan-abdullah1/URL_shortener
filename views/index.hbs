@@ -11,7 +11,8 @@
 <body>
   <div class="container d-flex justify-content-center align-items-center " style="height: 100vh;">
     <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
-      <div class="row">
+      <div class="row border rounded p-4" style="width: 500px;">
+        <h4 class="mb-4">Sign In</h4>
         <!-- Email and Password login form -->
         <div class="col-12">
           {{!-- <form action="/v1/auth/login" method="post"> --}}
@@ -33,17 +34,22 @@
         <div class="col-12 mt-3">
           <form action="/auth/google" method="get">
             <button type="submit"
-              class="btn btn-light btn-lg d-flex align-items-center shadow-sm border px-4 py-2 w-100">
-              <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" class="me-2"
+              class="btn btn-light  btn-lg d-flex align-items-center justify-content-center shadow-sm border px-4 py-2 w-100">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" class="me-2"
                 width="24" height="24">
               <span>Sign in with Google</span>
             </button>
           </form>
         </div>
         <!-- Registration Button -->
+        <div class="d-flex mt-3">
+          <span class="col-5"><hr /> </span>
+          <span class="col-2 text-secondary">&nbsp;&nbsp;&nbsp;&nbsp; New ?</span>
+          <span class="col-5"><hr /> </span>
+        </div>
         <div class="col-12 mt-3">
           <a href="/auth/register"
-            class="btn btn-secondary btn-lg w-100 d-flex align-items-center justify-content-center">
+            class="btn btn-white border rounded btn-lg w-100 d-flex align-items-center justify-content-center">
             Register for an Account
           </a>
         </div>
@@ -87,11 +93,13 @@
         },
         body: JSON.stringify({ email, password })
       }).
-        then(res => {
-          if (!res.ok && res.status === 401) {
-            throw new Error('invalid credentials')
+        then(async (res) => {
+         
+         const response =  await res.json();
+           if (!res?.ok ) {
+            console.log(response.message)
+             throw new Error(JSON.stringify(response.message) );
           }
-          return res.json();
         })
         .then(data => {
           document.location = '/url-shortener'

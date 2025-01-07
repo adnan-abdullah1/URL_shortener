@@ -12,12 +12,12 @@
 <body>
     <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
-            <div class="row">
+            <div class="row border rounded p-4" style="max-width:500px">
                 <!-- Registration Form -->
 
                 <div class="col-12">
                     {{!-- <form action="/v1/auth/register" method="post"> --}}
-                        <h2 class="mb-4 text-center">Create an Account</h2>
+                        <h2 class="mb-4">Register</h2>
                         <p id="errorLabel" class="d-none">Validation Error</p>
 
                         <div class="mb-3">
@@ -51,7 +51,7 @@
                 </div>
                 <!-- Back to Login -->
                 <div class="col-12 mt-3">
-                    <a href="/auth/login" class="btn btn-secondary w-100">Back to Login</a>
+                    <a href="/auth/login" class="btn border background rounded w-100">Back to Login</a>
                 </div>
             </div>
         </div>
@@ -91,11 +91,17 @@
                 },
                 body: JSON.stringify({ email, password, confirmPassword, firstName, lastName })
             })
-                .then(res => {
-                    if (!res.ok && res.status === 409) {
-                        throw new Error('Email already exists')
-                    }
-                    return res.json()
+                .then(async(res) => {
+                    const responseBody = await res.json(); 
+        if (!res.ok) {
+            switch (res.status) {
+                case 409:
+                    throw new Error(JSON.stringify(responseBody.message) || 'Email already exists');
+                default:
+                    throw new Error(JSON.stringify(responseBody.message )|| 'An unknown error occurred');
+            }
+        }
+        return responseBody; 
                 })
                 .then(data => {
                     window.location = '/auth/login';
