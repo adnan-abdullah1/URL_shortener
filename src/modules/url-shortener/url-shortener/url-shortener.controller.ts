@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
@@ -15,6 +16,8 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { ViewAuthFilter } from 'src/exceptions/unauthorized.exception';
 import { UserService } from 'src/user/user.service';
 import { Request, Response } from 'express';
+import { UrlDto } from '../dto/url.dto';
+import { ShortUrlDto } from '../dto/short-url.dto';
 
 @Controller('url-shortener')
 export class UrlShortenerController {
@@ -33,10 +36,10 @@ export class UrlShortenerController {
   @UseGuards(AuthGuard)
   @UseFilters(ViewAuthFilter)
   @Post('shorten')
-  @ApiBody({ schema: { example: { url: 'https://www.google.com' } } }) // this is for swagger
-  async shortenUrl(@Req() req, @Res() res) {
+ 
+  async shortenUrl(@Req() req, @Res() res,@Body() body:UrlDto) {
     try {
-      const { url } = req.body;
+      const { url } = body;
       const { email } = req['user'];
       const prefix = `${req.protocol}://${req.hostname}:${process.env.PORT}/url-shortener/`;
       const user = await this.userService.findUser(email);
@@ -80,9 +83,9 @@ export class UrlShortenerController {
   @UseGuards(AuthGuard)
   @UseFilters(ViewAuthFilter)
   @Post('/original-url')
-  async getUrl(@Req() req, @Res() res) {
+  async getUrl(@Req() req, @Res() res,@Body() body:ShortUrlDto) {
     try {
-      const { shortURL } = req.body;
+      const { shortURL } = body;
       if (!shortURL) {
         return res
           .status(HttpStatus.BAD_REQUEST)
@@ -100,7 +103,8 @@ export class UrlShortenerController {
           .json({ message: 'URL not found for the provided hash' });
       }
 
-      // Update the click count (could be saved in Redis for later periodic update)
+      // Update the click count 
+      // TODO: could be saved in Redis periodic update instead calling db per call
       await this.urlShortenerService.updateClickCount(url);
 
       return res.json({ originalURL: url });

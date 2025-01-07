@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
@@ -13,6 +14,8 @@ import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
 import { UserService } from 'src/user/user.service';
 import { UserType } from 'src/enum/user-type';
+import { UserDto } from './dto/user.dto';
+import { AuthDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -69,10 +72,10 @@ export class AuthController {
   }
 
   @Post('/login')
-  async login(@Req() req: Request, @Res() res: Response) {
-    const { email, password } = req.body;
+  async login(@Res() res: Response,@Body() body:AuthDto) {
+    const { email, password } = body;
     // gets users password
-    const user = await this.userService.findUser(email, ['password']);
+    const user = await this.userService.findUser(email, ['password','id']);
     if (!user || !user.password) {
       return res.status(401).json({ message: 'User not found' });
     }
@@ -98,8 +101,8 @@ export class AuthController {
   }
 
   @Post('/register')
-  async registerUser(@Req() req: Request, @Res() res: Response) {
-    const { email, firstName, lastName, password } = req.body;
+  async registerUser(@Res() res: Response,@Body() user:UserDto) {
+    const { email, firstName, lastName, password } = user;
     const id = uuidv4();
 
     try {
@@ -128,5 +131,10 @@ export class AuthController {
         message: 'An error occurred while registering the user.',
       });
     }
+  }
+  @Get('/logout')
+  async logout(@Res() res:Response){
+    res.cookie('auth_token',null);
+    res.render('index')
   }
 }

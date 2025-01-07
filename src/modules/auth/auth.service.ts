@@ -46,6 +46,7 @@ export class AuthService {
       .orIgnore()
       .execute();
   }
+  
   signToken(payload: { email: string; userId: string }) {
     return this.jwtService.signAsync(payload, {
       expiresIn: '1d',
@@ -53,13 +54,14 @@ export class AuthService {
     });
   }
 
+  // Extracts token from cookie
   extractTokenFromCookie(request: Request): string | undefined {
     const tokenStr = request.headers.cookie
       ?.split(';')
       .find((el) => el.includes('auth_token'));
 
     if (!tokenStr) return undefined;
-    const val = tokenStr?.split('=')[1]; // splits like ['auth_token','token_value']
+    const val = tokenStr?.split('=')[1]; // splits like ['auth_token','token_value'] and gets index 1
     return val ?? undefined;
   }
 
@@ -73,7 +75,7 @@ export class AuthService {
       return false;
     }
   }
-
+  
   async hashPassword(password: string) {
     return bcrypt.hash(password, parseInt(process.env.SAlT_ROUNDS));
   }
