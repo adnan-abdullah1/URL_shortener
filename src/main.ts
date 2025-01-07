@@ -21,6 +21,7 @@ async function bootstrap() {
     .setDescription('The URL Shortener description')
     .setVersion('1.0')
     .addTag('URL Shortener')
+    .addCookieAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
