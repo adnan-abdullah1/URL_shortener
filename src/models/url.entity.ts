@@ -21,6 +21,7 @@ export class URL {
   @Column('int', { default: 0 })
   click_count: number;
 
+  // on delete of user, i don't want to delete corresponding urls
   @ManyToOne(() => User, (user) => user.urls, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'userId' })
   user: User;

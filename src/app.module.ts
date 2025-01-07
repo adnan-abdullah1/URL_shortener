@@ -16,10 +16,12 @@ import { URL } from './models/url.entity';
 
 @Module({
   imports: [
+    // set up env
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env'],
     }),
+    // typeorm config
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,

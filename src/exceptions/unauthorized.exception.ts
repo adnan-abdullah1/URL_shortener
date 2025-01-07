@@ -9,6 +9,7 @@ import { UnauthorizedException } from '@nestjs/common';
 
 @Catch(UnauthorizedException)
 export class ViewAuthFilter implements ExceptionFilter {
+  // argumentHost: provides info about current req and response
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

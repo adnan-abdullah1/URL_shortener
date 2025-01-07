@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { HttpExceptionFilter } from './exceptions/http.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -14,7 +15,6 @@ async function bootstrap() {
   app.setViewEngine('hbs');
   // serve static assets
   app.useStaticAssets(join(__dirname, '..', 'public'));
-
 
   const config = new DocumentBuilder()
     .setTitle('URL Shortener')
@@ -35,6 +35,10 @@ async function bootstrap() {
     .then(() => {
       console.log(`Server is running on http://localhost:${port}`);
     });
+
+  // use http exception filter at global level
+  // so i don't need to import at each controller
+  app.useGlobalFilters(new HttpExceptionFilter());
 }
 
 bootstrap();
