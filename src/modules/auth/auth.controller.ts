@@ -72,10 +72,10 @@ export class AuthController {
   }
 
   @Post('/login')
-  async login(@Res() res: Response,@Body() body:AuthDto) {
+  async login(@Res() res: Response, @Body() body: AuthDto) {
     const { email, password } = body;
     // gets users password
-    const user = await this.userService.findUser(email, ['password','id']);
+    const user = await this.userService.findUser(email, ['password', 'id']);
     if (!user || !user.password) {
       return res.status(401).json({ message: 'User not found' });
     }
@@ -91,7 +91,8 @@ export class AuthController {
     // create token and add to cookie
     const token = await this.authService.signToken({ email, userId: user.id });
 
-    res.cookie('auth_token', token, { httpOnly: true, secure: true });
+    //httpOnly cookies are not red by client
+    res.cookie('auth_token', token, { httpOnly: true });
     return res.status(HttpStatus.OK).json({ login: true, accessToken: token });
   }
 
@@ -101,7 +102,7 @@ export class AuthController {
   }
 
   @Post('/register')
-  async registerUser(@Res() res: Response,@Body() user:UserDto) {
+  async registerUser(@Res() res: Response, @Body() user: UserDto) {
     const { email, firstName, lastName, password } = user;
     const id = uuidv4();
 
@@ -133,8 +134,8 @@ export class AuthController {
     }
   }
   @Get('/logout')
-  async logout(@Res() res:Response){
-    res.cookie('auth_token',null);
-    res.render('index')
+  async logout(@Res() res: Response) {
+    res.cookie('auth_token', null);
+    res.render('index');
   }
 }

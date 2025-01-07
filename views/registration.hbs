@@ -91,17 +91,17 @@
                 },
                 body: JSON.stringify({ email, password, confirmPassword, firstName, lastName })
             })
-                .then(async(res) => {
-                    const responseBody = await res.json(); 
-        if (!res.ok) {
-            switch (res.status) {
-                case 409:
-                    throw new Error(JSON.stringify(responseBody.message) || 'Email already exists');
-                default:
-                    throw new Error(JSON.stringify(responseBody.message )|| 'An unknown error occurred');
-            }
-        }
-        return responseBody; 
+                .then(async (res) => {
+                    const responseBody = await res.json();
+                    if (!res.ok) {
+                        switch (res.status) {
+                            case 409:
+                                throw new Error(JSON.stringify(responseBody.message) || 'Email already exists');
+                            default:
+                                throw new Error(JSON.stringify(responseBody.message) || 'An unknown error occurred');
+                        }
+                    }
+                    return responseBody;
                 })
                 .then(data => {
                     window.location = '/auth/login';

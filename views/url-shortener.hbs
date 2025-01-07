@@ -13,9 +13,9 @@
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center ">
             <h1>URL Shortener</h1>
-           <form action="/auth/logout">
-             <button type="submit" class="border btn btn-danger rounded p-2" >Logout</button>
-           </form>
+            <form action="/auth/logout">
+                <button type="submit" class="border btn btn-danger rounded p-2">Logout</button>
+            </form>
         </div>
 
         <!-- Bootstrap Tabs for Shortened and Original URLs -->
@@ -28,7 +28,7 @@
                 <a class="nav-link" id="original-tab" data-bs-toggle="tab" href="#original" role="tab"
                     aria-controls="original" aria-selected="false">Original URL</a>
             </li>
-             <li class="nav-item" role="presentation" onclick="fetchAnalytics()">
+            <li class="nav-item" role="presentation" onclick="fetchAnalytics()">
                 <a class="nav-link" id="analytics-tab" data-bs-toggle="tab" href="#analytics" role="tab"
                     aria-controls="analytics" aria-selected="false">Analytics</a>
             </li>
@@ -39,7 +39,7 @@
             <div class="tab-pane fade show active" id="shortened" role="tabpanel" aria-labelledby="shortened-tab">
                 <div class="mb-3">
                     <label for="url" class="form-label">Enter URL</label>
-                    <input  class="form-control mb-3" id="url" name="url" required>
+                    <input class="form-control mb-3" id="url" name="url" required>
                     <button type="button" onclick="shortenURL()" class="btn btn-primary" id="shortenButton">Shorten
                         URL</button>
                 </div>
@@ -64,26 +64,26 @@
                     <p>Your original URL is: <a id="originalURL" href="" target="_blank"></a></p>
                 </div>
             </div>
-             <!-- Analytics  Tab -->
+            <!-- Analytics  Tab -->
             <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
-             <div class="container mt-3">
+                <div class="container mt-3">
 
-    <h1 class="mb-4">Analytics Table</h1>
-    <table class="table table-striped table-bordered">
-      <thead class="table-dark">
-        <tr>
-          <th>#</th>
-          <th>URL</th>
-          <th>Total Hits</th>
-        </tr>
+                    <h1 class="mb-4">Analytics Table</h1>
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>URL</th>
+                                <th>Total Hits</th>
+                            </tr>
 
-      </thead>
-      <tbody id="analyticsTableBody">
-        <!-- Data rows will be inserted here dynamically -->
-      </tbody>
-    </table>
-    <h6 id="loading" class="d-flex justify-content-center">Loading..</h6>
-  </div>
+                        </thead>
+                        <tbody id="analyticsTableBody">
+                            <!-- Data rows will be inserted here dynamically -->
+                        </tbody>
+                    </table>
+                    <h6 id="loading" class="d-flex justify-content-center">Loading..</h6>
+                </div>
             </div>
         </div>
 
@@ -103,33 +103,33 @@
 
         // Analytics function
         var isLoading = true
-    // fetch analytics
-    function fetchAnalytics() {
-      fetch('/analytics/user-analytics')
-        .then(res => res.json())
-        .then(data => {
-          const tableBody = document.getElementById('analyticsTableBody');
+        // fetch analytics
+        function fetchAnalytics() {
+            fetch('/analytics/user-analytics')
+                .then(res => res.json())
+                .then(data => {
+                    const tableBody = document.getElementById('analyticsTableBody');
 
-          tableBody.innerHTML = data.map((item, index) => `
+                    tableBody.innerHTML = data.map((item, index) => `
             <tr>
               <td>${index + 1}</td>
               <td>${item.url}</td>
               <td>${item.click_count}</td>
             </tr>
           `).join('');
-        })
-        .catch(err => {
-          console.error('Error fetching analytics:', err);
-        }).finally(res => {
-          // hide loading...
-          const isLoadingEl=document.getElementById('loading');
-          if(isLoadingEl){
-            isLoadingEl.style.visibility='hidden'
-          }
-        });
-    }
+                })
+                .catch(err => {
+                    console.error('Error fetching analytics:', err);
+                }).finally(res => {
+                    // hide loading...
+                    const isLoadingEl = document.getElementById('loading');
+                    if (isLoadingEl) {
+                        isLoadingEl.style.visibility = 'hidden'
+                    }
+                });
+        }
 
-   
+
 
         // Function to shorten URL
         function shortenURL() {
@@ -154,16 +154,16 @@
                 body: JSON.stringify({ url }),
             })
                 .then(async (res) => {
-                    const response =  await res.json();
-                     if (!res?.ok ) {
-                         console.log(response.message)
-                         alert(response.message[0] || 'Error shortening URL' )
-                        throw new Error(JSON.stringify(response.message) );
-          }
-          return response
-        })
-                   
-               
+                    const response = await res.json();
+                    if (!res?.ok) {
+                        console.log(response.message)
+                        alert(response.message[0] || 'Error shortening URL')
+                        throw new Error(JSON.stringify(response.message));
+                    }
+                    return response
+                })
+
+
                 .then(data => {
                     const shortenedURL = document.getElementById('shortenedURL');
                     const result = document.getElementById('shortenedURLResult');
@@ -176,7 +176,7 @@
                 })
                 .catch(err => {
                     console.error('Error shortening URL:', err);
-                    {{!-- alert('Error shortening URL'); --}}
+                    { { !--alert('Error shortening URL'); --} }
                 })
                 .finally(() => {
                     shortenButton.innerText = 'Shorten URL';
@@ -206,11 +206,11 @@
                 },
                 body: JSON.stringify({ shortURL }),
             })
-                .then(res =>{
-                    if(!res.ok){
+                .then(res => {
+                    if (!res.ok) {
                         throw new Error('')
                     }
-                    return   res.json()
+                    return res.json()
                 })
                 .then(data => {
                     const originalURL = document.getElementById('originalURL');
@@ -231,12 +231,12 @@
                     getOriginalButton.disabled = false;
                 });
         }
-    function logout(){
-        fetch('/auth/logout',{
-            method: 'GET',
-                
-        })
-    }
+        function logout() {
+            fetch('/auth/logout', {
+                method: 'GET',
+
+            })
+        }
     </script>
 </body>
 

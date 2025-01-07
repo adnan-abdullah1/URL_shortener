@@ -51,9 +51,9 @@
           console.error('Error fetching analytics:', err);
         }).finally(res => {
           // hide loading...
-          const isLoadingEl=document.getElementById('loading');
-          if(isLoadingEl){
-            isLoadingEl.style.visibility='hidden'
+          const isLoadingEl = document.getElementById('loading');
+          if (isLoadingEl) {
+            isLoadingEl.style.visibility = 'hidden'
           }
         });
     }

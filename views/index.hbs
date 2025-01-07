@@ -35,17 +35,21 @@
           <form action="/auth/google" method="get">
             <button type="submit"
               class="btn btn-light  btn-lg d-flex align-items-center justify-content-center shadow-sm border px-4 py-2 w-100">
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" class="me-2"
-                width="24" height="24">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo"
+                class="me-2" width="24" height="24">
               <span>Sign in with Google</span>
             </button>
           </form>
         </div>
         <!-- Registration Button -->
         <div class="d-flex mt-3">
-          <span class="col-5"><hr /> </span>
+          <span class="col-5">
+            <hr />
+          </span>
           <span class="col-2 text-secondary">&nbsp;&nbsp;&nbsp;&nbsp; New ?</span>
-          <span class="col-5"><hr /> </span>
+          <span class="col-5">
+            <hr />
+          </span>
         </div>
         <div class="col-12 mt-3">
           <a href="/auth/register"
@@ -94,11 +98,11 @@
         body: JSON.stringify({ email, password })
       }).
         then(async (res) => {
-         
-         const response =  await res.json();
-           if (!res?.ok ) {
+
+          const response = await res.json();
+          if (!res?.ok) {
             console.log(response.message)
-             throw new Error(JSON.stringify(response.message) );
+            throw new Error(JSON.stringify(response.message));
           }
         })
         .then(data => {
