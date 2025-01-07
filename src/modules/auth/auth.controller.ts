@@ -52,7 +52,8 @@ export class AuthController {
         userId: userData.id,
       });
 
-      res.cookie('auth_token', token, { httpOnly: true, secure: true });
+      // httpOnly, client is not able to rad cookie
+      res.cookie('auth_token', token, { httpOnly: true });
       return res.redirect(`/url-shortener/`);
     } catch (error) {
       return res.json(error);
