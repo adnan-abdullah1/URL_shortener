@@ -36,12 +36,11 @@ export class UrlShortenerController {
   @UseGuards(AuthGuard)
   @UseFilters(ViewAuthFilter)
   @Post('shorten')
- 
-  async shortenUrl(@Req() req, @Res() res,@Body() body:UrlDto) {
+  async shortenUrl(@Req() req, @Res() res, @Body() body: UrlDto) {
     try {
       const { url } = body;
       const { email } = req['user'];
-      const prefix = `${req.protocol}://${req.hostname}:${process.env.PORT}/url-shortener/`;
+      const prefix = `${process.env.DOMAIN}/url-shortener/`;
       const user = await this.userService.findUser(email);
 
       if (!user || !user.id) {
@@ -83,7 +82,7 @@ export class UrlShortenerController {
   @UseGuards(AuthGuard)
   @UseFilters(ViewAuthFilter)
   @Post('/original-url')
-  async getUrl(@Req() req, @Res() res,@Body() body:ShortUrlDto) {
+  async getUrl(@Req() req, @Res() res, @Body() body: ShortUrlDto) {
     try {
       const { shortURL } = body;
       if (!shortURL) {
@@ -103,7 +102,7 @@ export class UrlShortenerController {
           .json({ message: 'URL not found for the provided hash' });
       }
 
-      // Update the click count 
+      // Update the click count
       // TODO: could be saved in Redis periodic update instead calling db per call
       await this.urlShortenerService.updateClickCount(url);
 
