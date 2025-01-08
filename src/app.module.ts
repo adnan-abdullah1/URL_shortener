@@ -55,7 +55,7 @@ import { URL } from './models/url.entity';
         });
         return {
           store: store as unknown as CacheStore,
-          ttl: 60 * 60 * 24, // valid for one day
+          ttl: 24 * 60 * 60 * 1000, // valid for one day
         };
       },
     }),

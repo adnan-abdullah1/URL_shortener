@@ -119,7 +119,7 @@ export class UrlShortenerService {
       }
 
       // Set the result in the cache
-      await this.cacheManager.set(cacheKey, urlEntity.url); // Will be cached for one day
+      await this.cacheManager.set(cacheKey, urlEntity.url, 24 * 60 * 60 * 1000); // Will be cached for one day
       this.logger.log('Data set in cache');
       this.logger.log('Returning URL from DB');
       return urlEntity.url;
