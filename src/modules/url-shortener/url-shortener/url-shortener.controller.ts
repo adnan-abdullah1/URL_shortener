@@ -94,17 +94,21 @@ export class UrlShortenerController {
       // Extract  hash from the shortened URL
       const hash = new URL(shortURL).pathname.split('/').filter(Boolean).pop();
 
-      const url = await this.urlShortenerService.getURL(hash);
+      // find in hash
+      let url = await this.urlShortenerService.getURL(hash);
+
+      // if not in cache find in db
+
+      if (!url) {
+        const data = await this.urlShortenerService.getLongURL(hash);
+        url = data.url;
+      }
 
       if (!url) {
         return res
           .status(HttpStatus.NOT_FOUND)
           .json({ message: 'URL not found for the provided hash' });
       }
-
-      // Update the click count
-      // TODO: could be saved in Redis periodic update instead calling db per call
-      await this.urlShortenerService.updateClickCount(url);
 
       return res.json({ originalURL: url });
     } catch (error) {

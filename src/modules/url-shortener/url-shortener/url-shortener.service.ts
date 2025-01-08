@@ -138,6 +138,12 @@ export class UrlShortenerService {
     return this.urlRepository.findOne({ where: { url }, select: ['hash'] });
   }
 
+  getLongURL(hash: string) {
+    return this.urlRepository.findOne({
+      where: { hash: hash },
+      select: ['url'],
+    });
+  }
   async getClickCount(userId: string) {
     return this.urlRepository.find({ where: { user: { id: userId } } });
   }
